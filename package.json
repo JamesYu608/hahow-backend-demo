@@ -1,0 +1,20 @@
+{
+  "name": "hahow-backend-demo",
+  "version": "1.0.0",
+  "description": "This is a backend demo project for Hahow recruitment.",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "author": "jamesyu608@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^6.12.2",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "standard": "^14.3.4"
+  }
+}
