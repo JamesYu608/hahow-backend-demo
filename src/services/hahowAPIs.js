@@ -4,12 +4,30 @@
 const got = require('got')
 const hahowConfig = require('../../config').DATA_SOURCE.HAHOW
 const schema = require('./hahowAPIsSchema')
+const logger = require('../utils/logger')
+const AppError = require('../utils/AppError')
 
 const HEROES_URL = `${hahowConfig.API_URL}/heroes`
 
+// All remote API calls follow the same 4 steps
 async function getAllHeroes () {
-  const response = await getResponse(
-    'get', HEROES_URL, schema.getAllHeroesValidate)
+  const URL = HEROES_URL
+  // Step 1: Send request to remote API
+  let response
+  try {
+    response = await got.get(URL).json()
+  } catch (e) {
+    // Step 2: Check response status code is 200 or not
+    throw responseStatusError('GET', URL, e)
+  }
+
+  // Step 3: Check response content is what we expect
+  // e.g. status code: 200, but content is { code: 1000, message: 'Backend error' }
+  if (!schema.getAllHeroesValidate(response)) {
+    throw responseSchemaError('GET', URL, response)
+  }
+
+  // Step 4: Process response content
   return response.map(data => ({
     id: data.id,
     name: data.name,
@@ -18,8 +36,23 @@ async function getAllHeroes () {
 }
 
 async function getHeroById (heroId) {
-  const response = await getResponse(
-    'get', `${HEROES_URL}/${heroId}`, schema.getHeroByIdValidate)
+  const URL = `${HEROES_URL}/${heroId}`
+  let response
+  try {
+    response = await got.get(URL).json()
+  } catch (e) {
+    // in this case, we treat 404 as a normal response, just return null
+    if (e.response.statusCode === 404) {
+      return null
+    }
+    // if not 404, it's still a remote API error
+    throw responseStatusError('GET', URL, e)
+  }
+
+  if (!schema.getHeroByIdValidate(response)) {
+    throw responseSchemaError('GET', URL, response)
+  }
+
   return {
     id: response.id,
     name: response.name,
@@ -28,8 +61,21 @@ async function getHeroById (heroId) {
 }
 
 async function getHeroProfileById (heroId) {
-  const response = await getResponse(
-    'get', `${HEROES_URL}/${heroId}/profile`, schema.getHeroProfileByIdValidate)
+  const URL = `${HEROES_URL}/${heroId}/profile`
+  let response
+  try {
+    response = await got.get(URL).json()
+  } catch (e) {
+    if (e.response.statusCode === 404) {
+      return null
+    }
+    throw responseStatusError('GET', URL, e)
+  }
+
+  if (!schema.getHeroProfileByIdValidate(response)) {
+    throw responseSchemaError('GET', URL, response)
+  }
+
   return {
     str: response.str,
     int: response.int,
@@ -45,28 +91,24 @@ async function authenticate (name, password) {
     })
     return true
   } catch (e) {
-    // TODO: 401 and 400
-    console.log(e.response.statusCode)
-    return false
-    // TODO: unable to get data from hahow, throw error
+    const { statusCode } = e.response
+    if (statusCode !== 400 && statusCode !== 401) {
+      logger.error(`Unable to get expected authenticate response from Hahow, error: ${e.toString()}`)
+    }
   }
+  return false
 }
 
-async function getResponse (method = 'get', url = '', validate) {
-  let response
-  try {
-    response = await got[method](url).json()
-  } catch (e) {
-    // TODO: log, unable to get data from hahow, throw error
-  }
+function responseStatusError (method, url, error) {
+  return AppError.badImplementation(
+    null, `Unable to get response from Hahow, URL: [${method}] ${url}, error: ${error.toString()}`
+  )
+}
 
-  if (!validate(response)) {
-    // TODO: log, bad response data, throw error
-    // e.g. { code: 1000, message: 'Backend error' }
-    console.log('error')
-  }
-
-  return response
+function responseSchemaError (method, url, response) {
+  return AppError.badImplementation(
+    null, `Unable to handle response from Hahow, URL: [${method}] ${url}, response: ${JSON.stringify(response)}`
+  )
 }
 
 module.exports = {
