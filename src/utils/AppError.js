@@ -2,6 +2,8 @@
 // So we can distinguish app errors (expected) and other errors (unexpected)
 // Besides, instead of throwing new errors everywhere, we extract common errors and create them in the same way
 
+const logger = require('./logger')
+
 class AppError extends Error {
   constructor (name, code, message, logMessage = 'No additional information', isOperational = true) {
     super()
@@ -28,6 +30,34 @@ class AppError extends Error {
 
   static badImplementation (message = 'An internal server error occurred', logMessage = '') {
     return new AppError('Bad implementation', 500, message, logMessage)
+  }
+
+  static handler (error) {
+    // [DANGEROUS] Unknown error, warp this error in our app error and set the flag "isOperational" to false
+    if (!(error instanceof AppError)) {
+      error = new AppError(error.name, error.message, 'Unknown error', error.toString(), false)
+    }
+
+    // Build log message from error to help us for troubleshooting
+    const logMessage = {
+      error: {
+        name: error.name,
+        code: error.code,
+        message: error.message,
+        logMessage: error.logMessage,
+        isOperational: error.isOperational
+      }
+    }
+
+    if (!error.isOperational) {
+      logger.error(logMessage)
+    } else if (error.code >= 500) {
+      logger.warn(logMessage)
+    } else {
+      logger.info(logMessage)
+    }
+
+    return error.isOperational
   }
 }
 

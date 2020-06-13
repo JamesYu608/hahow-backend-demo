@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const logger = require('../utils/logger')
 const authenticate = require('../middlewares/authenticate')
 const heroes = require('./heros')
+const appErrorHandler = require('../middlewares/appErrorHanlder')
 
 const router = Router()
 // middlewares
@@ -19,5 +20,8 @@ router.get('/', (req, res) => res.send('Hello World!'))
 
 // API routes
 router.use('/heroes', heroes)
+
+// error handler middlewares
+router.use(appErrorHandler)
 
 module.exports = router
