@@ -3,34 +3,55 @@
 // But here are only two GET methods, so I put them together in the same file
 
 const { Router } = require('express')
+const HeroDAL = require('../components/heroes/HeroDAL')
+const AppError = require('../utils/AppError')
 
 const router = Router()
 router.get('/', getAllHeroes)
 router.get('/:heroId', getHero)
 
+const heroDAL = new HeroDAL()
+
 async function getAllHeroes (req, res) {
-  console.log(req.isAuthenticated)
-  res.json([
-    {
-      id: '1',
-      name: 'Daredevil',
-      image: 'http://i.annihil.us/u/prod/marvel/i/mg/6/90/537ba6d49472b/standard_xlarge.jpg'
-    },
-    {
-      id: '2',
-      name: 'Thor',
-      image: 'http://x.annihil.us/u/prod/marvel/i/mg/5/a0/537bc7036ab02/standard_xlarge.jpg'
-    }
-  ])
+  const hasProfile = req.isAuthenticated
+  const heroes = await heroDAL.getAllHeroes(hasProfile)
+  const data = heroes.map(hero => {
+    return buildResponseData(hero, hasProfile)
+  })
+
+  res.json({
+    heroes: data
+  })
 }
 
 async function getHero (req, res) {
-  console.log(req.isAuthenticated)
-  res.json({
-    id: '1',
-    name: 'Daredevil',
-    image: 'http://i.annihil.us/u/prod/marvel/i/mg/6/90/537ba6d49472b/standard_xlarge.jpg'
-  })
+  const hasProfile = req.isAuthenticated
+  const { heroId } = req.params
+  const hero = await heroDAL.getHero(heroId, hasProfile)
+  if (!hero) {
+    throw AppError.notFound('Hero is not found!')
+  }
+  const data = buildResponseData(hero, hasProfile)
+  res.json(data)
+}
+
+function buildResponseData (hero, hasProfile) {
+  const heroData = {
+    id: hero.heroId.toString(),
+    name: hero.name,
+    image: hero.image
+  }
+  if (hasProfile) {
+    const heroProfile = hero.profile
+    heroData.profile = {
+      str: heroProfile.str,
+      int: heroProfile.int,
+      agi: heroProfile.agi,
+      luk: heroProfile.luk
+    }
+  }
+
+  return heroData
 }
 
 module.exports = router
