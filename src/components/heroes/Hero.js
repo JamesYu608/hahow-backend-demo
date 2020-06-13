@@ -16,6 +16,19 @@ class Hero {
       luk: parseInt(profile.luk) || -1
     }
   }
+
+  // just for fun
+  attack () {
+    const { str, int, agi, luk } = this.profile
+    return {
+      power: str + int + agi + luk,
+      percentage: getRandomArbitrary(0.7, 1.0)
+    }
+
+    function getRandomArbitrary (min, max) {
+      return Math.random() * (max - min) + min
+    }
+  }
 }
 
 module.exports = Hero
