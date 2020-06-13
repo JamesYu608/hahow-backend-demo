@@ -3,7 +3,7 @@
 
 const got = require('got')
 const hahowConfig = require('../../config').DATA_SOURCE.HAHOW
-const schema = require('./hahowAPIsSchema')
+const schema = require('./hahowAPISchema')
 const logger = require('../utils/logger')
 const AppError = require('../utils/AppError')
 
