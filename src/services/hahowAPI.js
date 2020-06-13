@@ -42,7 +42,7 @@ async function getHeroById (heroId) {
     response = await got.get(URL).json()
   } catch (e) {
     // in this case, we treat 404 as a normal response, just return null
-    if (e.response.statusCode === 404) {
+    if (e.response && e.response.statusCode === 404) {
       return null
     }
     // if not 404, it's still a remote API error
@@ -66,7 +66,7 @@ async function getHeroProfileById (heroId) {
   try {
     response = await got.get(URL).json()
   } catch (e) {
-    if (e.response.statusCode === 404) {
+    if (e.response && e.response.statusCode === 404) {
       return null
     }
     throw responseStatusError('GET', URL, e)
@@ -91,12 +91,19 @@ async function authenticate (name, password) {
     })
     return true
   } catch (e) {
-    const { statusCode } = e.response
-    if (statusCode !== 400 && statusCode !== 401) {
-      logger.error(`Unable to get expected authenticate response from Hahow, error: ${e.toString()}`)
+    if (!isExpectedError(e)) {
+      logger.warn(`Unable to get expected authenticate response from Hahow, error: ${e.toString()}`)
     }
+    return false
   }
-  return false
+
+  function isExpectedError (error) {
+    if (!error.response) {
+      return false
+    }
+    const { statusCode } = error.response
+    return statusCode === 400 || statusCode === 401
+  }
 }
 
 function responseStatusError (method, url, error) {
