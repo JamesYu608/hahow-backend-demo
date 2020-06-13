@@ -4,5 +4,6 @@
 
 const { PORT } = require('./config')
 const app = require('./src')
+const logger = require('./src/utils/logger')
 
-app.listen(PORT, () => console.log(`Hahow backend demo project is listening on port ${PORT}!`))
+app.listen(PORT, () => logger.info(`Hahow backend demo project is listening on port ${PORT}!`))
