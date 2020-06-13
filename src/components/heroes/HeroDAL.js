@@ -3,6 +3,7 @@
 
 const Hero = require('./Hero')
 const hahowAPI = require('../../services/hahowAPI')
+const AppError = require('../../utils/AppError')
 
 class HeroDAL {
   async getAllHeroes (hasProfile = false) {
@@ -49,14 +50,18 @@ class HeroDAL {
 
   async setHeroProfile (hero) {
     const rawHeroProfileData = await hahowAPI.getHeroProfileById(hero.heroId)
-    if (rawHeroProfileData) {
-      hero.setProfile({
-        str: rawHeroProfileData.str,
-        int: rawHeroProfileData.int,
-        agi: rawHeroProfileData.agi,
-        luk: rawHeroProfileData.luk
-      })
+    if (!rawHeroProfileData) {
+      throw AppError.badImplementation(
+        null, `heroId "${hero.heroId}" not found when getting hero profile, it shouldn't happen`
+      )
     }
+
+    hero.setProfile({
+      str: rawHeroProfileData.str,
+      int: rawHeroProfileData.int,
+      agi: rawHeroProfileData.agi,
+      luk: rawHeroProfileData.luk
+    })
   }
 }
 
