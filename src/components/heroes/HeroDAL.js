@@ -44,9 +44,7 @@ class HeroDAL {
   }
 
   async setHeroesProfile (heroes) {
-    for (const hero of heroes) {
-      await this.setHeroProfile(hero)
-    }
+    return Promise.all(heroes.map(hero => this.setHeroProfile(hero)))
   }
 
   async setHeroProfile (hero) {
