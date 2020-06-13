@@ -5,5 +5,19 @@
 const { PORT } = require('./config')
 const app = require('./src')
 const logger = require('./src/utils/logger')
+const AppError = require('./src/utils/AppError')
 
 app.listen(PORT, () => logger.info(`Hahow backend demo project is listening on port ${PORT}!`))
+
+// Catching unresolved and rejected promises
+process.on('unhandledRejection', (reason) => {
+  // throw and handle it in uncaughtException
+  throw reason
+})
+process.on('uncaughtException', (error) => {
+  const isOperationalError = AppError.handler(error)
+  if (!isOperationalError) {
+    // do something to gracefully restart the service
+    process.exit(1)
+  }
+})
