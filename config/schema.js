@@ -3,12 +3,27 @@
 
 const Ajv = require('ajv')
 
+const dataSourceSchema = {
+  type: 'object',
+  properties: {
+    HAHOW: {
+      type: 'object',
+      properties: {
+        API_URL: { type: 'string' }
+      },
+      required: ['API_URL']
+    }
+  },
+  required: ['HAHOW']
+}
+
 const schema = {
   type: 'object',
   properties: {
-    PORT: { type: 'number' }
+    PORT: { type: 'number' },
+    DATA_SOURCE: dataSourceSchema
   },
-  required: ['PORT']
+  required: ['PORT', 'DATA_SOURCE']
 }
 
 const ajv = new Ajv({ removeAdditional: true, useDefaults: true, coerceTypes: true })

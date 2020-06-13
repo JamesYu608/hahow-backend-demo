@@ -5,7 +5,12 @@
 const { validate } = require('./schema')
 
 const config = {
-  PORT: 8080
+  PORT: 8080,
+  DATA_SOURCE: {
+    HAHOW: {
+      API_URL: 'https://hahow-recruit.herokuapp.com'
+    }
+  }
 }
 
 if (!validate(config)) {
