@@ -9,6 +9,7 @@ router.get('/', getAllHeroes)
 router.get('/:heroId', getHero)
 
 async function getAllHeroes (req, res) {
+  console.log(req.isAuthenticated)
   res.json([
     {
       id: '1',
@@ -24,6 +25,7 @@ async function getAllHeroes (req, res) {
 }
 
 async function getHero (req, res) {
+  console.log(req.isAuthenticated)
   res.json({
     id: '1',
     name: 'Daredevil',
