@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const logger = require('../utils/logger')
 const authenticate = require('../middlewares/authenticate')
-const heroes = require('./heros')
+const heroes = require('./heroes')
 const appErrorHandler = require('../middlewares/appErrorHanlder')
 
 const router = Router()
