@@ -35,7 +35,7 @@ async function getAllHeroes (req, res) {
   const hasProfile = req.isAuthenticated
   const heroes = await heroDAL.getAllHeroes(hasProfile)
   const data = heroes.map(hero => {
-    return buildResponseData(hero, hasProfile)
+    return buildHeroData(hero, hasProfile)
   })
 
   res.json({
@@ -50,7 +50,7 @@ async function getHero (req, res) {
   if (!hero) {
     throw AppError.notFound('Hero is not found!')
   }
-  const data = buildResponseData(hero, hasProfile)
+  const data = buildHeroData(hero, hasProfile)
   res.json(data)
 }
 
@@ -67,7 +67,7 @@ async function createDuel (req, res) {
   res.json(results)
 }
 
-function buildResponseData (hero, hasProfile) {
+function buildHeroData (hero, hasProfile) {
   const heroData = {
     id: hero.heroId.toString(),
     name: hero.name,
