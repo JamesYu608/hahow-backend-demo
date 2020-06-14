@@ -9,6 +9,21 @@
     "unit": "jest --config=jest.config.unit.js --detectOpenHandles",
     "integration": "jest --config=jest.config.integration.js --detectOpenHandles"
   },
+  "standard": {
+    "ignore": [
+      "/test/seed/"
+    ],
+    "globals": [
+      "jest",
+      "describe",
+      "test",
+      "expect",
+      "beforeEach",
+      "beforeAll",
+      "afterEach",
+      "afterAll"
+    ]
+  },
   "author": "jamesyu608@gmail.com",
   "license": "ISC",
   "dependencies": {
