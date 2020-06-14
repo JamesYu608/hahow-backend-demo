@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "standard"
+    "test": "standard && jest --config=jest.config.js --detectOpenHandles",
+    "unit": "jest --config=jest.config.unit.js --detectOpenHandles",
+    "integration": "jest --config=jest.config.integration.js --detectOpenHandles"
   },
   "author": "jamesyu608@gmail.com",
   "license": "ISC",
