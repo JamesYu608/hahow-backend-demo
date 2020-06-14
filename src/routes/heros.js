@@ -3,12 +3,14 @@
 // But here are only two GET methods, so I put them together in the same file
 
 const { Router } = require('express')
+const Hero = require('../components/heroes/Hero')
 const HeroDAL = require('../components/heroes/HeroDAL')
 const AppError = require('../utils/AppError')
 
 const router = Router()
 router.get('/', getAllHeroes)
 router.get('/:heroId', getHero)
+router.post('/duel', createDuel)
 
 const heroDAL = new HeroDAL()
 
@@ -33,6 +35,19 @@ async function getHero (req, res) {
   }
   const data = buildResponseData(hero, hasProfile)
   res.json(data)
+}
+
+async function createDuel (req, res) {
+  const { heroId1, heroId2 } = req.body
+  const [hero1, hero2] = await Promise.all([
+    heroDAL.getHero(heroId1, true),
+    heroDAL.getHero(heroId2, true)
+  ])
+  if (!hero1 || !hero2) {
+    throw AppError.notFound('Hero is not found!')
+  }
+  const results = Hero.duel(hero1, hero2)
+  res.json(results)
 }
 
 function buildResponseData (hero, hasProfile) {

@@ -83,11 +83,11 @@ class Hero {
     }
 
     function buildRoundFightResult (winner, loser, damage) {
-      return `${winner.name} hit ${loser.name}, damage: ${damage}`
+      return `${winner.name} hits ${loser.name}, damage: ${damage}`
     }
 
     function buildWinResult (winner) {
-      return `${winner.name} win the fight!`
+      return `${winner.name} wins the fight!`
     }
 
     function buildDrawResult () {
