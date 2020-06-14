@@ -1,17 +1,34 @@
 // This is the entry point of heroes routes
-// Generally, I will put each route's business logic in a single file (e.g. routes/heroes/getAllHeroes.js)
-// But here are only two GET methods, so I put them together in the same file
+
+// Generally, I will put each route's business logic and request schema in a single file (e.g. routes/heroes/getAllHeroes.js)
+// But here are only few methods, so I put them together in this file
 
 const { Router } = require('express')
+const requestValidator = require('../middlewares/requestValidator')
 const Hero = require('../components/heroes/Hero')
 const HeroDAL = require('../components/heroes/HeroDAL')
 const AppError = require('../utils/AppError')
 
+// Request schema
+// Early return 400 when request format is unexpected
+const createDuelSchema = {
+  body: {
+    type: 'object',
+    properties: {
+      heroId1: { type: 'integer' },
+      heroId2: { type: 'integer' }
+    },
+    required: ['heroId1', 'heroId2']
+  }
+}
+
+// Setup routes
 const router = Router()
 router.get('/', getAllHeroes)
 router.get('/:heroId', getHero)
-router.post('/duel', createDuel)
+router.post('/duel', requestValidator(createDuelSchema), createDuel)
 
+// Business logic
 const heroDAL = new HeroDAL()
 
 async function getAllHeroes (req, res) {
