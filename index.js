@@ -15,8 +15,8 @@ process.on('unhandledRejection', (reason) => {
   throw reason
 })
 process.on('uncaughtException', (error) => {
-  const isOperationalError = AppError.handler(error)
-  if (!isOperationalError) {
+  const appError = AppError.handler(error)
+  if (!appError.isOperational) {
     // do something to gracefully restart the service
     process.exit(1)
   }

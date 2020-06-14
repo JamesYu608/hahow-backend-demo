@@ -1,6 +1,6 @@
 // This is our customized error class which extends built-in error class
 // So we can distinguish app errors (expected) and other errors (unexpected)
-// Besides, instead of throwing new errors everywhere, we extract common errors and create them in the same way
+// Besides, rather than arbitrarily create errors everywhere, we extract common errors and create them in the same way
 
 const logger = require('./logger')
 
@@ -32,10 +32,17 @@ class AppError extends Error {
     return new AppError('Bad implementation', 500, message, logMessage)
   }
 
+  // Handle error (e.g. logging), return AppError instance (wrap unknown error if needed)
   static handler (error) {
-    // [DANGEROUS] Unknown error, warp this error in our app error and set the flag "isOperational" to false
+    // Errors thrown by system
     if (!(error instanceof AppError)) {
-      error = new AppError(error.name, error.message, 'Unknown error', error.toString(), false)
+      // Case 1: Errors we know and we can handle
+      if (error.name === 'SyntaxError') {
+        error = AppError.badRequest('Syntax Error!')
+      } else {
+        // Case 2:[DANGEROUS] Unknown error, wrap this error in AppError instance and set the flag "isOperational" to false
+        error = new AppError(error.name, error.message, 'Unknown error', error.toString(), false)
+      }
     }
 
     // Build log message from error to help us for troubleshooting
@@ -57,7 +64,7 @@ class AppError extends Error {
       logger.info(logMessage)
     }
 
-    return error.isOperational
+    return error
   }
 }
 

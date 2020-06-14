@@ -4,13 +4,13 @@
 const AppError = require('../utils/AppError')
 
 function appErrorHandler (err, req, res, next) {
-  const isOperationalError = AppError.handler(err)
-  if (isOperationalError) {
+  const appError = AppError.handler(err)
+  if (appError.isOperational) {
     // Known issue, just return error response to user
-    res.status(err.code)
+    res.status(appError.code)
       .json({
-        code: err.code,
-        message: err.message
+        code: appError.code,
+        message: appError.message
       })
   } else {
     // [DANGEROUS] Unknown issue occurred!
