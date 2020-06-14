@@ -1,6 +1,7 @@
 const HeroDAL = require('../../../src/components/heroes/HeroDAL')
 const hahowAPI = require('../../../src/services/hahowAPI')
 const heroesSeed = require('../../seed/heroes.seed')
+const AppError = require('../../../src/utils/AppError')
 
 describe('[Integration][Component] HeroDAL', () => {
   const heroDAL = new HeroDAL()
@@ -78,7 +79,7 @@ describe('[Integration][Component] HeroDAL', () => {
       })
       const hahowGetAllHeroesSpy = jest.spyOn(hahowAPI, 'getAllHeroes').mockResolvedValue(mockHeroesData)
       const hahowGetHeroProfileByIdSpy = jest.spyOn(hahowAPI, 'getHeroProfileById').mockImplementation(() => {
-        throw new Error('whatever')
+        throw AppError.badImplementation()
       })
 
       // Act & Assert

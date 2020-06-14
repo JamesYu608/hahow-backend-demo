@@ -46,7 +46,7 @@ async function getAllHeroes (req, res) {
 async function getHero (req, res) {
   const hasProfile = req.isAuthenticated
   const { heroId } = req.params
-  const hero = await heroDAL.getHero(heroId, hasProfile)
+  const hero = await heroDAL.getHero(parseInt(heroId), hasProfile)
   if (!hero) {
     throw AppError.notFound('Hero is not found!')
   }
