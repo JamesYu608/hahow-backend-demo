@@ -21,9 +21,11 @@ describe('[Integration][Middleware] Authenticate', () => {
     hahowAuthenticateSpy.mockRestore()
   })
 
-  test('Has name and password, but authentication failed, req.isAuthenticated should be false', async () => {
+  test('Has name and password, but authentication failed, an error should be thrown and req.isAuthenticated should be false', async () => {
     // Arrange
-    const hahowAuthenticateSpy = jest.spyOn(hahowAPI, 'authenticate').mockResolvedValue(false)
+    const hahowAuthenticateSpy = jest.spyOn(hahowAPI, 'authenticate').mockImplementation(() => {
+      throw new Error('whatever')
+    })
     const req = {
       headers: {
         name: 'james',
@@ -31,10 +33,8 @@ describe('[Integration][Middleware] Authenticate', () => {
       }
     }
 
-    // Act
-    await authenticate(req, {}, jest.fn())
-
-    // Assert
+    // Act & Assert
+    await expect(authenticate(req, {}, jest.fn())).rejects.toThrowError()
     expect(req.isAuthenticated).toBe(false)
 
     hahowAuthenticateSpy.mockRestore()

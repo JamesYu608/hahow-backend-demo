@@ -24,6 +24,10 @@ class AppError extends Error {
     return new AppError('Bad request', 400, message, logMessage)
   }
 
+  static unauthorized (message, logMessage) {
+    return new AppError('Unauthorized', 401, message, logMessage)
+  }
+
   static notFound (message, logMessage) {
     return new AppError('Not found', 404, message, logMessage)
   }

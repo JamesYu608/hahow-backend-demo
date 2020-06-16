@@ -1,6 +1,7 @@
 const got = require('got')
 const hahowAPI = require('../../src/services/hahowAPI')
 const heroesSeed = require('../seed/heroes.seed')
+const AppError = require('../../src/utils/AppError')
 
 describe('[Integration][Service] Hahow API', () => {
   describe('[Function] getAllHeroes', () => {
@@ -160,17 +161,28 @@ describe('[Integration][Service] Hahow API', () => {
       gotSpy.mockRestore()
     })
 
-    test('Response is not 200, return false', async () => {
+    test('Response is 401, throw unauthorized error', async () => {
+      // Arrange
+      const gotSpy = jest.spyOn(got, 'post').mockImplementation(() => {
+        const error = new Error('whatever')
+        error.response = { statusCode: 401 }
+        throw error
+      })
+
+      // Act & Assert
+      await expect(hahowAPI.authenticate('hahow', 'rocks')).rejects.toThrowError(AppError.unauthorized().name)
+
+      gotSpy.mockRestore()
+    })
+
+    test('Response is not 200 or 401 (unexpected), throw badImplementation error', async () => {
       // Arrange
       const gotSpy = jest.spyOn(got, 'post').mockImplementation(() => {
         throw new Error('whatever')
       })
 
-      // Act
-      const result = await hahowAPI.authenticate('hahow', 'rocks')
-
-      // Assert
-      expect(result).toBe(false)
+      // Act & Assert
+      await expect(hahowAPI.authenticate('hahow', 'rocks')).rejects.toThrowError(AppError.badImplementation().name)
 
       gotSpy.mockRestore()
     })

@@ -4,7 +4,6 @@
 const got = require('got')
 const hahowConfig = require('../../config').DATA_SOURCE.HAHOW
 const schema = require('./hahowAPISchema')
-const logger = require('../utils/logger')
 const AppError = require('../utils/AppError')
 
 const HEROES_URL = `${hahowConfig.API_URL}/heroes`
@@ -85,24 +84,17 @@ async function getHeroProfileById (heroId) {
 }
 
 async function authenticate (name, password) {
+  const URL = `${hahowConfig.API_URL}/auth`
   try {
-    await got.post(`${hahowConfig.API_URL}/auth`, {
+    await got.post(URL, {
       json: { name, password }
     })
     return true
   } catch (e) {
-    if (!isExpectedError(e)) {
-      logger.warn(`Unable to get expected authenticate response from Hahow, error: ${e.toString()}`)
+    if (!e.response || e.response.statusCode !== 401) {
+      throw responseStatusError('POST', URL, e)
     }
-    return false
-  }
-
-  function isExpectedError (error) {
-    if (!error.response) {
-      return false
-    }
-    const { statusCode } = error.response
-    return statusCode === 400 || statusCode === 401
+    throw AppError.unauthorized()
   }
 }
 

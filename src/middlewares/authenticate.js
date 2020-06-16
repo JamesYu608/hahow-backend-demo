@@ -5,11 +5,13 @@
 const hahowAPI = require('../services/hahowAPI')
 
 async function authenticate (req, res, next) {
+  req.isAuthenticated = false
+
   const { name, password } = req.headers
   if (name && password) {
-    req.isAuthenticated = await hahowAPI.authenticate(name, password)
-  } else {
-    req.isAuthenticated = false
+    if (await hahowAPI.authenticate(name, password)) {
+      req.isAuthenticated = true
+    }
   }
   next()
 }
