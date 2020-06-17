@@ -392,6 +392,24 @@ describe('[Unit][Component] Hero model', () => {
 
 另外我也盡量在一個測項中只測試一件事情，避免太多環節彼此干擾，以及增加定位錯誤的難度。
 
+實際跑出來的測試結果，以 `services/hahowAPI.js` 的測試來說，大概是像這樣子：
+
+```bash
+ PASS  test/services/hahowAPI.int.test.js
+  [Integration][Service] Hahow API
+    [Function] getAllHeroes
+      ✓ Response is 200 and data is expected, return heroes data (3 ms)
+      ✓ Response is 200 but data is not expected, throw error (9 ms)
+      ✓ Response is not 200, throw error (2 ms)
+    [Function] getHeroById
+      ✓ Response is 200 and get expected data, return hero data (1 ms)
+      ✓ Response is 404, return null (1 ms)
+    [Function] authenticate
+      ✓ Response is 200, return true
+      ✓ Response is 401, throw unauthorized error (2 ms)
+      ✓ Response is not 200 or 401 (unexpected), throw badImplementation error (1 ms)
+```
+
 ## 議題探討
 
 以下是我認為除了目前的需求外，其它幾個可以討論的部分。還有針對 Hahow 提出的問題的回答。
